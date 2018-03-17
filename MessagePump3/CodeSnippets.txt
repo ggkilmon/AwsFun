@@ -1,0 +1,68 @@
+﻿Send a model/Consume message
+
+Show class structure of messagepumpmodel
+
+Paste into MessagePump.cs main:
+MessagePumpModel model = new MessagePumpModel()
+            {
+                Id = Guid.NewGuid(),
+                Message = string.Format("Hello World; {1}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")),
+            };
+            service.SendMessage(model);
+
+
+Talk about json convert
+
+Run program to send message
+
+Show message in queue
+
+Paste into MessagePumpService.cs:
+public void ConsumeMessage()
+        {
+            try
+            {
+                logger.Debug("Receiving message(s)");
+                ReceiveMessageRequest request = new ReceiveMessageRequest(QUEUE_URL);
+                ReceiveMessageResponse response = _client.ReceiveMessage(request);
+                logger.Debug("Message(s) received with status code: {0}", response.HttpStatusCode);
+                if (response.Messages.Count > 0)
+                {
+                    foreach (var m in response.Messages)
+                    {
+                        var model = JsonConvert.DeserializeObject<MessagePumpModel>(m.Body);
+                        logger.Debug("Message {0}; Guid {2}; {1}", m.MessageId, model.Message, model.Id);
+                    }
+                }
+                else
+                {
+                    logger.Debug("Retrieved 0 messages");
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Error("Retrieve message failed; {0}", ex.ToString());
+            }
+        }
+
+Talk about request, response, json deserialization
+
+Paste into MessagePump.cs main:
+service.ConsumeMessage();
+
+Run program to send message and consume message
+
+Talk about how message is still in the queue; show it, delete it
+
+Paste into MessagePumpService.cs ConsumeMessage:
+try
+                        {
+                            logger.Debug("Deleting message {0}", m.MessageId);
+                            DeleteMessageRequest deleteRequest = new DeleteMessageRequest(QUEUE_URL, m.ReceiptHandle);
+                            DeleteMessageResponse deleteResponse = _client.DeleteMessage(deleteRequest);
+                            logger.Debug("Message {0} deleted with status code: {1}", m.MessageId, deleteResponse.HttpStatusCode);
+                        }
+                        catch (Exception ex)
+                        {
+                            logger.Debug("Delete message failed; left on queue for consumption again; {0}", ex.ToString());
+                        }

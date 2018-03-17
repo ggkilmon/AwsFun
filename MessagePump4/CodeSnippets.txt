@@ -1,0 +1,55 @@
+﻿Check if there are any more messages
+
+Paste into MessagePumpService.cs
+public bool IsMessageOnQueue()
+        {
+            try
+            {
+                List<string> attributes = new List<string>();
+                attributes.Add("ApproximateNumberOfMessages");
+                GetQueueAttributesRequest request = new GetQueueAttributesRequest(QUEUE_URL, attributes);
+                GetQueueAttributesResponse response = _client.GetQueueAttributes(request);
+                int numberOfMessages = response.ApproximateNumberOfMessages;
+
+                if (numberOfMessages > 0)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Error("Get Attributes failed; {0}", ex);
+            }
+
+            return true;
+        }
+
+Explain attribute on queue
+
+Paste into MessagePump.cs main:
+int count = 0;
+            bool doReceiveMessage = true;
+            while (1 == 1)
+            {
+                if (count % 5 == 0)
+                {
+                    doReceiveMessage = service.IsMessageOnQueue();
+                }
+
+                if (doReceiveMessage)
+                {
+                    service.ConsumeMessage();
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+Explain while loop, keep reading until empty, check on every fifth message
+
+Run program and show how it produces and then consumes, until there are no more messages

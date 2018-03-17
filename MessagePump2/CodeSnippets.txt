@@ -1,0 +1,26 @@
+﻿Send Message
+
+Talk about how its separated into a service class, constructor is basically the same as before
+
+Paste into MessagePumpService.cs class:
+public void SendMessage(string message)
+        {
+            try
+            {
+                logger.Debug("Sending message: {0}", message);
+                SendMessageRequest request = new SendMessageRequest(QUEUE_URL, message);
+                SendMessageResponse response = _client.SendMessage(request);
+                logger.Debug("Message sent with status code: {0}", response.HttpStatusCode);
+            }
+            catch (Exception ex)
+            {
+                logger.Error("Send message failed: {0}", ex.ToString());
+            }
+        }
+
+Talk about request model, response model
+
+Paste into MessagePump.cs main:
+service.SendMessage("Hello World");
+
+Run program, show message in queue in AWS

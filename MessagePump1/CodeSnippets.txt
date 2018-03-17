@@ -1,0 +1,26 @@
+﻿Configure SQS Client
+
+Go over IAM
+	AccessKeyId; SecretAccessKeyId
+	Permissions
+
+Create new queue
+	grab the url
+
+Go over nuget packages
+
+Paste into main:
+SecureString awsAccessKeyId = ConfigurationManager.AppSettings["AWS:AccessKeyId"].ToSecureString();
+SecureString awsSecretAccessKey = ConfigurationManager.AppSettings["AWS:SecretAccessKey"].ToSecureString();
+
+Go over SecureStringExtensions
+
+Go over other ways to read credentials
+
+Paste into main:
+AmazonSQSConfig config = new AmazonSQSConfig();
+config.RegionEndpoint = RegionEndpoint.USWest2;
+
+AmazonSQSClient client = new AmazonSQSClient(awsAccessKeyId.ToUnsecureString(), awsSecretAccessKey.ToUnsecureString(), config);
+            
+Console.ReadLine();
